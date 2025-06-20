@@ -1,7 +1,7 @@
 $programPath = "C:\Users\arekw\Desktop\FolderyTestowe\Wycenny\Cheron"
 $startPath = "C:\Users\arekw\Desktop\PowerShell"
 $txtFile = "C:\Users\arekw\Desktop\FolderyTestowe\Wycenny\Wyceny.txt"
-$tmp = "C:\Users\arekw\Desktop\FolderyTestowe\Wycenny\Cheron\1006785"
+$tmp1 = "C:\Users\arekw\Desktop\FolderyTestowe\Wycenny\Cheron\1006785"
 $tmp2 = "C:\Users\arekw\Desktop\FolderyTestowe\Wycenny\Cheron\1179823"
 
 $list = New-Object Collections.Generic.List[Int]
@@ -9,48 +9,35 @@ $list2 = New-Object Collections.Generic.List[Int]
 
 $Pdf_files = New-Object Collections.Generic.List[string]
 $Dwg_Dxf_files = New-Object Collections.Generic.List[string]
-#Functin opens file of giwen path
+#Functin opens file of given path
 function OpenFolder {
     param (
         $newProgramPath
     )
     Start-Process $newProgramPath
 }
-function OpenDWG_DXF {
+#Function is openig files by extention in the given path
+function OpenFileByExtension {
     param (
-        $currentDirectory
+        $currentDirectory,
+        $listOfFiles,
+        $extension
     )
 
     Set-Location $currentDirectory
-    $pdfs = Get-ChildItem -Path $currentDirectory -Include *.dwg -Force -Name
-    $Pdf_files= $pdfs
+    $tmp = Get-ChildItem -Path $currentDirectory -Include *$extension -Force -Name
+    $listOfFiles= $tmp
 
-    foreach($item in $Pdf_files){
+    foreach($item in $listOfFiles){
         
         $newProgramPath = "{0}\{1}" -f $currentDirectory, $item
         #Write-Host "[", "Nazwa:", $newProgramPath, "]" -ForegroundColor Yellow
-        Invoke-Item $newProgramPath
-    }
-    #Invoke-Item $programPath
-}
-
-function OpenPDF {
-    param (
-        $currentDirectory
-    )
-    Set-Location $currentDirectory
-    $pdfs = Get-ChildItem -Path $currentDirectory -Include *.pdf -Force -Name
-    $Pdf_files= $pdfs
-
-    foreach($item in $Pdf_files){
-        
-        $newProgramPath = "{0}\{1}" -f $currentDirectory, $item
-        #Write-Host "[", "Nazwa:", $newProgramPath, "]" -ForegroundColor Yellow
+        #Invoke-Item $newProgramPath
         Start-Process $newProgramPath
     }
-
-    #Start-Process $programPath
+    
 }
+
 function GetDataFromTXT {
     param (
         $txtFilePath
@@ -110,7 +97,7 @@ function GetItemNames {
             #Write-host "D == " -f red -nonewline;
             #Write-host $currentDirectory -f blue
 
-            #OpenFolder $currentDirectory
+            OpenFolder $currentDirectory
 
             Get-ChildItem -Path $newProgramPath -Name
         }else {
@@ -133,8 +120,8 @@ function Start-Program{
     Write-host "--------------------"
     GetItemNames $programPath
 
-    #OpenPDF $tmp
-    OpenDWG_DXF $tmp2
+    OpenFileByExtension  $tmp1 $Pdf_files .pdf
+    OpenFileByExtension  $tmp2 $Dwg_Dxf_files .dwg
     Set-Location $startPath
 }
 
